@@ -14,14 +14,14 @@
 
 **Sprint Hedefi:** Kullanıcı kayıt olup giriş yapabilir, proje oluşturup listeleyebilir. Site canlıda.
 
-- [ ] **S1-T1:** Next.js 15 (App Router) + TypeScript + Tailwind CSS kurulumu
-- [ ] **S1-T2:** shadcn/ui kurulumu + tema (Türkçe UI, i18n'e hazır metin yapısı)
-- [ ] **S1-T3:** Supabase projesi bağlantısı — client/server helper'lar, env yapısı
-- [ ] **S1-T4:** Veritabanı şeması + RLS politikaları (profiles, projects, generations, timeline_items, publications) — SQL migration dosyası
-- [ ] **S1-T5:** Auth — kayıt ol / giriş yap / çıkış (Supabase Auth, e-posta + şifre)
-- [ ] **S1-T6:** Korumalı dashboard layout (sidebar + header + auth middleware)
-- [ ] **S1-T7:** Proje Yönetimi ekranı — proje oluştur / listele / sil (CRUD)
-- [ ] **S1-T8:** Vercel deploy + mafilu.com domain bağlantısı
+- [x] **S1-T1:** Next.js 15 (App Router) + TypeScript + Tailwind CSS kurulumu
+- [x] **S1-T2:** shadcn/ui kurulumu + tema (Türkçe UI, i18n'e hazır metin yapısı)
+- [x] **S1-T3:** Supabase projesi bağlantısı — client/server helper'lar, env yapısı
+- [x] **S1-T4:** Veritabanı şeması + RLS politikaları (profiles, projects, generations, timeline_items, publications) — SQL migration dosyası
+- [x] **S1-T5:** Auth — kayıt ol / giriş yap / çıkış (Supabase Auth, e-posta + şifre)
+- [x] **S1-T6:** Korumalı dashboard layout (sidebar + header + auth middleware)
+- [x] **S1-T7:** Proje Yönetimi ekranı — proje oluştur / listele / sil (CRUD)
+- [ ] **S1-T8:** Vercel deploy + mafilu.com domain bağlantısı *(PO'dan Supabase + Vercel erişimi bekleniyor)*
 
 **✋ SPRINT 1 SONU — PO TESTİ:** Kayıt ol → giriş yap → proje oluştur → çıkış yap. Canlı linkte çalışıyor mu?
 
