@@ -1,0 +1,43 @@
+export const tr = {
+  common: {
+    appName: "Mafilu",
+    loading: "Yükleniyor...",
+    save: "Kaydet",
+    cancel: "Vazgeç",
+    delete: "Sil",
+    create: "Oluştur",
+    back: "Geri",
+    error: "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
+  },
+  auth: {
+    signIn: "Giriş Yap",
+    signUp: "Kayıt Ol",
+    signOut: "Çıkış Yap",
+    email: "E-posta",
+    password: "Şifre",
+    fullName: "Ad Soyad",
+    noAccount: "Hesabın yok mu?",
+    hasAccount: "Zaten hesabın var mı?",
+    signInTitle: "Mafilu'ya hoş geldin",
+    signInSubtitle: "Hesabına giriş yap ve üretmeye devam et",
+    signUpTitle: "Hesap oluştur",
+    signUpSubtitle: "Saniyeler içinde AI ile video üretmeye başla",
+    invalidCredentials: "E-posta veya şifre hatalı.",
+    signUpSuccess: "Hesabın oluşturuldu! Giriş yapabilirsin.",
+  },
+  dashboard: {
+    title: "Panel",
+    projects: "Projeler",
+    newProject: "Yeni Proje",
+    emptyTitle: "Henüz projen yok",
+    emptySubtitle: "İlk projeni oluştur ve AI ile video üretmeye başla.",
+    projectTitle: "Proje adı",
+    projectDescription: "Açıklama (isteğe bağlı)",
+    deleteConfirm: "Bu projeyi silmek istediğine emin misin?",
+    statusDraft: "Taslak",
+    statusEditing: "Düzenleniyor",
+    statusPublished: "Yayınlandı",
+  },
+} as const;
+
+export type Messages = typeof tr;
