@@ -31,12 +31,12 @@
 
 **Sprint Hedefi:** Kullanıcı prompt girer, AI video/görsel üretilir, galeriye düşer.
 
-- [ ] **S2-T1:** Replicate API entegrasyonu — server-side client + model seçimi (hızlı/ucuz açık kaynak video modeli + FLUX görsel fallback)
-- [ ] **S2-T2:** Üretim API route'u — prompt al, Replicate prediction başlat, `generations` tablosuna kaydet
-- [ ] **S2-T3:** Replicate webhook — üretim tamamlanınca çıktıyı Supabase Storage'a kaydet, durumu güncelle
-- [ ] **S2-T4:** Prompt ekranı (proje içi) — prompt girişi, tip seçimi (video/görsel), üretim başlat butonu
-- [ ] **S2-T5:** Üretim durumu takibi — polling/realtime ile "üretiliyor → tamamlandı" gösterimi
-- [ ] **S2-T6:** Üretim galerisi — proje içindeki tüm üretimleri grid'de göster, önizleme
+- [x] **S2-T1:** Replicate API entegrasyonu — server-side client + model seçimi (wan-2.2-t2v-fast video + flux-schnell görsel)
+- [x] **S2-T2:** Üretim API route'u — prompt al, Replicate prediction başlat, `generations` tablosuna kaydet
+- [x] **S2-T3:** Replicate webhook (prod) + polling (yerel) — çıktı Supabase Storage'a kaydedilir, durum güncellenir
+- [x] **S2-T4:** Prompt ekranı (proje içi) — prompt girişi, tip seçimi (video/görsel), üretim başlat butonu
+- [x] **S2-T5:** Üretim durumu takibi — 5 sn'lik polling ile "üretiliyor → tamamlandı" gösterimi
+- [x] **S2-T6:** Üretim galerisi — proje içindeki tüm üretimleri grid'de göster, önizleme
 
 **✋ SPRINT 2 SONU — PO TESTİ:** Prompt yaz → üret → videonun galeriye düştüğünü gör.
 
