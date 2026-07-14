@@ -22,10 +22,13 @@ function isRunning(status: GenerationStatus): boolean {
 
 export function GenerationGrid({ initial }: { initial: Generation[] }) {
   const [generations, setGenerations] = useState<Generation[]>(initial);
+  const [prevInitial, setPrevInitial] = useState(initial);
 
-  useEffect(() => {
+  // Sunucu verisi değişince state'i render sırasında senkronla (effect'siz)
+  if (prevInitial !== initial) {
+    setPrevInitial(initial);
     setGenerations(initial);
-  }, [initial]);
+  }
 
   useEffect(() => {
     const runningIds = generations.filter((g) => isRunning(g.status)).map((g) => g.id);

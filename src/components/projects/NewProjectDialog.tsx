@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 import { Plus } from "lucide-react";
 import {
   createProject,
@@ -28,11 +28,14 @@ export function NewProjectDialog() {
     initialState
   );
 
-  useEffect(() => {
+  // Aksiyon başarıyla dönünce dialogu kapat (render sırasında, effect'siz)
+  const [prevState, setPrevState] = useState(state);
+  if (prevState !== state) {
+    setPrevState(state);
     if (state.success) {
       setOpen(false);
     }
-  }, [state]);
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
