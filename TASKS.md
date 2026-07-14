@@ -30,27 +30,33 @@
 ## ⚙️ Sprint 2 — AI Üretim Motoru (17–22 Temmuz)
 
 **Sprint Hedefi:** Kullanıcı prompt girer, AI video/görsel üretilir, galeriye düşer.
+**Revizyon (14 Tem):** Sağlayıcı-bağımsız mimariye geçildi — geliştirmede yerel ComfyUI (0 TL), canlıda fal.ai, Replicate yedek.
 
-- [x] **S2-T1:** Replicate API entegrasyonu — server-side client + model seçimi (wan-2.2-t2v-fast video + flux-schnell görsel)
-- [x] **S2-T2:** Üretim API route'u — prompt al, Replicate prediction başlat, `generations` tablosuna kaydet
-- [x] **S2-T3:** Replicate webhook (prod) + polling (yerel) — çıktı Supabase Storage'a kaydedilir, durum güncellenir
+- [x] **S2-T1:** Replicate API entegrasyonu (artık yedek sağlayıcı)
+- [x] **S2-T2:** Üretim API route'u — prompt al, üretim başlat, `generations` tablosuna kaydet
+- [x] **S2-T3:** Webhook (Replicate/prod) + polling — çıktı Supabase Storage'a kaydedilir, durum güncellenir
 - [x] **S2-T4:** Prompt ekranı (proje içi) — prompt girişi, tip seçimi (video/görsel), üretim başlat butonu
 - [x] **S2-T5:** Üretim durumu takibi — 5 sn'lik polling ile "üretiliyor → tamamlandı" gösterimi
 - [x] **S2-T6:** Üretim galerisi — proje içindeki tüm üretimleri grid'de göster, önizleme
+- [x] **S2R-T1:** Provider abstraction — `MediaProvider` arayüzü, `MEDIA_PROVIDER` env seçimi, `external_id` migration'ı (0002)
+- [x] **S2R-T2:** ComfyUIProvider — yerel ComfyUI API, `comfy/workflows/*.json` şablonları (`__PROMPT__`/`__SEED__`)
+- [x] **S2R-T3:** FalProvider — canlı geçiş için fal.ai queue API iskeleti (model seçimi env ile)
+- [x] **S2R-T4:** ComfyUI kurulum rehberi (`docs/COMFYUI_SETUP.md`) — 8 GB VRAM'e uygun model önerileri + LTX-Video export akışı
+- [ ] **S2R-T5:** PO: ComfyUI kurulumu + görsel workflow testi (rehber adım 1-2) ve video workflow export'u (adım 3)
 
-**✋ SPRINT 2 SONU — PO TESTİ:** Prompt yaz → üret → videonun galeriye düştüğünü gör.
+**✋ SPRINT 2 SONU — PO TESTİ:** ComfyUI açıkken prompt yaz → üret → çıktının galeriye düştüğünü gör (0 TL).
 
 ---
 
 ## 🎬 Sprint 3 — "Illusion" Editör (22–27 Temmuz)
 
-**Sprint Hedefi:** CapCut hissi veren timeline editörü. Gerçek render yok — state DB'de tutulur.
+**Sprint Hedefi:** CapCut hissi veren timeline editörü — **Remotion Player** tabanlı (karar 14 Tem). Tarayıcıda gerçek kompozisyon önizlemesi; render kapısı ileriye açık.
 
-- [ ] **S3-T1:** Editör sayfası iskeleti — önizleme alanı + timeline paneli layout'u
-- [ ] **S3-T2:** Timeline klip bileşeni — galeriden klip ekleme, drag-and-drop ile sıralama (dnd-kit)
-- [ ] **S3-T3:** Sıralı video önizleme — klipleri arka arkaya oynatan player (illusion)
-- [ ] **S3-T4:** Text/altyazı overlay — klip üstüne metin ekleme, konum/stil seçimi
-- [ ] **S3-T5:** Stok müzik seçici — 3-5 hazır müzik, önizlemede çalma
+- [ ] **S3-T1:** Remotion Player kurulumu + editör sayfası iskeleti (önizleme + timeline paneli)
+- [ ] **S3-T2:** Remotion kompozisyonu — klipleri sıralı oynatan `<Composition>` (video/görsel destekli)
+- [ ] **S3-T3:** Timeline klip bileşeni — galeriden klip ekleme, drag-and-drop ile sıralama (dnd-kit)
+- [ ] **S3-T4:** Text/altyazı overlay — Remotion katmanı olarak metin ekleme, konum/stil seçimi
+- [ ] **S3-T5:** Stok müzik seçici — 3-5 hazır müzik, Remotion audio track olarak önizleme
 - [ ] **S3-T6:** Editör state'inin DB'ye kaydı (`timeline_items`) — otomatik kaydet
 - [ ] **S3-T7:** "Dışa Aktar" butonu — timeline'ı yayına hazır olarak işaretle
 
@@ -76,6 +82,7 @@
 
 **Sprint Hedefi:** Sıfır kırık akış. Son 2 gün koda dokunulmaz.
 
+- [ ] **S5-T0:** Canlıya geçiş — `MEDIA_PROVIDER=fal` + fal.ai key + model seçimi + gerçek üretim smoke testi
 - [ ] **S5-T1:** Happy Path uçtan uca bug taraması ve düzeltmeler
 - [ ] **S5-T2:** Mobil/responsive kontrol (jüri telefondan açabilir)
 - [ ] **S5-T3:** Demo verisi — dolu görünen hesap, hazır projeler, örnek üretimler
@@ -90,7 +97,9 @@
 |---|---|---|
 | Supabase projesi (URL + anon key + service role key) | Sprint 1, T3 | ⏳ |
 | Vercel hesabı + mafilu.com DNS erişimi | Sprint 1, T8 | ⏳ |
-| Replicate API token (+ biraz kredi) | Sprint 2, T1 | ⏳ |
+| ComfyUI kurulumu (docs/COMFYUI_SETUP.md) | Sprint 2, S2R-T5 | ⏳ |
+| fal.ai API key (canlıya geçiş) | Sprint 5, T0 | ⏳ |
+| Replicate API token (yedek, opsiyonel) | — | ✅ token var, kredi yok |
 | Ayrshare API key (ücretsiz hesap) | Sprint 4, T1 | ⏳ |
 | Stok müzik dosyaları (telifsiz, 3-5 adet) | Sprint 3, T5 | ⏳ |
 
