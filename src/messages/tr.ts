@@ -38,6 +38,23 @@ export const tr = {
     statusEditing: "Düzenleniyor",
     statusPublished: "Yayınlandı",
   },
+  studio: {
+    promptLabel: "Ne üretmek istiyorsun?",
+    promptPlaceholder:
+      "Örn: Gün batımında sahilde koşan bir golden retriever, sinematik",
+    typeLabel: "Tür",
+    typeVideo: "Video",
+    typeImage: "Görsel",
+    generate: "Üret",
+    generating: "Üretiliyor...",
+    generationFailed: "Üretim başarısız",
+    galleryTitle: "Üretimler",
+    galleryEmpty: "Henüz üretim yok. İlk prompt'unu yaz ve Üret'e bas!",
+    statusPending: "Sırada",
+    statusProcessing: "Üretiliyor",
+    statusSucceeded: "Tamamlandı",
+    statusFailed: "Başarısız",
+  },
 } as const;
 
 export type Messages = typeof tr;
