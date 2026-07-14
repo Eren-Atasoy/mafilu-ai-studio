@@ -1,0 +1,73 @@
+# 🖥️ ComfyUI Kurulum Rehberi (Yerel, 0 TL Üretim)
+
+> Hedef donanım: **NVIDIA RTX 4060 Laptop (8 GB VRAM)** — görsel üretimi rahat,
+> video için LTX-Video sınıfı hafif modeller uygundur.
+>
+> Mimari: Uygulama `MEDIA_PROVIDER=comfyui` iken tüm üretim istekleri
+> `COMFYUI_URL`'e (varsayılan `http://127.0.0.1:8188`) gider. Workflow şablonları
+> `comfy/workflows/` klasöründedir; canlıya geçişte tek env değişikliğiyle
+> fal.ai'ye dönülür — kod değişmez.
+
+## 1. ComfyUI'yi Kur (10 dk)
+
+1. [ComfyUI Releases](https://github.com/comfyanonymous/ComfyUI/releases) sayfasından
+   **Windows Portable (nvidia)** zip'ini indir.
+2. Örneğin `D:\ComfyUI` içine çıkar.
+3. `run_nvidia_gpu.bat`'ı çalıştır → tarayıcıda `http://127.0.0.1:8188` açılır.
+4. Açık kaldığı sürece Mafilu üretim yapabilir. (Uygulama ile aynı anda çalışmalı.)
+
+## 2. Görsel Modeli (SD 1.5 — 8 GB için ideal, ~2 GB indirme)
+
+1. [DreamShaper 8](https://huggingface.co/Lykon/DreamShaper/resolve/main/DreamShaper_8_pruned.safetensors)
+   dosyasını indir.
+2. **Dosya adını `dreamshaper_8.safetensors` yap** (repodaki `comfy/workflows/image.json`
+   bu adı bekler — farklı bir checkpoint kullanacaksan JSON'daki `ckpt_name`'i değiştir).
+3. `D:\ComfyUI\ComfyUI\models\checkpoints\` klasörüne koy.
+4. ComfyUI'yi yeniden başlat.
+
+✅ Bu kadar — **görsel üretimi hazır.** Uygulamadan "Görsel" seçip prompt yazınca
+ComfyUI kuyruğuna düşer, çıktı Supabase Storage'a kopyalanır.
+
+## 3. Video Modeli (LTX-Video — 8 GB VRAM'de çalışan en pratik seçenek)
+
+LTX-Video workflow'ları kişisel kuruluma göre değiştiği için repoya hazır
+`video.json` koymadık — kendi çalışan workflow'unu export edeceksin:
+
+1. ComfyUI arayüzünde: **Workflow → Browse Templates → Video** altından
+   **LTX-Video (Text to Video)** şablonunu aç.
+2. Şablon eksik modelleri söyler; genellikle şunlar gerekir:
+   - `ltx-video-2b-v0.9.5.safetensors` → `models\checkpoints\`
+   - `t5xxl_fp8_e4m3fn.safetensors` (metin kodlayıcı) → `models\text_encoders\`
+   (ComfyUI'nin model indirme diyaloğu linkleri verir; toplam ~8 GB.)
+3. Şablonu bir kez çalıştırıp video aldığından emin ol.
+   8 GB VRAM için öneri: çözünürlük **768×512**, kare sayısı **97 (≈4 sn)** civarında tut.
+4. Prompt kutusundaki metni birebir şu yer tutucuyla değiştir: `__PROMPT__`
+   Varsa seed alanına da `__SEED__` yazabilirsin (opsiyonel).
+5. **Menü → Workflow → Export (API)** ile JSON'u indir ve repoda
+   `comfy/workflows/video.json` olarak kaydet.
+
+✅ Artık uygulamadan "Video" üretimi de yerelde çalışır. `video.json` yoksa
+uygulama bunu açıklayan Türkçe bir hata gösterir (pipeline kırılmaz).
+
+## 4. Sık Karşılaşılanlar
+
+| Belirti | Sebep / Çözüm |
+|---|---|
+| Kart "Başarısız: ComfyUI isteği reddetti" | ComfyUI kapalı — `run_nvidia_gpu.bat` çalışıyor mu? |
+| Kart "Başarısız: ... video.json dosyasını oluşturun" | Adım 3 tamamlanmadı. |
+| Üretim çok yavaş / OOM | Çözünürlüğü ve kare sayısını düşür; ComfyUI'yi `--lowvram` ile başlat. |
+| Çıktı geldi ama galeri boş | Workflow'da SaveImage/SaveVideo düğümü olmalı (Preview yetmez). |
+
+## 5. Canlıya Geçiş (Sprint 5)
+
+`.env`'de üç satır:
+
+```
+MEDIA_PROVIDER=fal
+FAL_KEY=<fal.ai anahtarın>
+FAL_VIDEO_MODEL=<seçilen model, örn. fal-ai/ltx-video>
+FAL_IMAGE_MODEL=<örn. fal-ai/flux/schnell>
+```
+
+fal.ai, ComfyUI workflow'larını da barındırabilir — yereldeki özel workflow'un
+(LoRA, IP-Adapter, stil kilidi vb.) canlıda aynen çalıştırılabilir.

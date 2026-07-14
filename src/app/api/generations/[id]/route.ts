@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getReplicate } from "@/lib/replicate";
+import { getProvider } from "@/lib/providers";
 import { finalizeGeneration } from "@/lib/generations/finalize";
 import type { Generation } from "@/lib/types";
 
 /**
- * Üretim durumu — beklemedeyse Replicate'ten taze durumu çekip ilerletir.
- * Webhook'un ulaşamadığı yerel geliştirmede de akışı çalıştırır (polling).
+ * Üretim durumu — beklemedeyse aktif sağlayıcıdan taze durumu çekip ilerletir.
+ * Webhook'suz sağlayıcılarda (ComfyUI) ve yerel geliştirmede akışı bu yürütür.
  */
 export async function GET(
   _request: Request,
@@ -36,15 +36,16 @@ export async function GET(
   const isRunning =
     generation.status === "processing" || generation.status === "pending";
 
-  if (isRunning && generation.replicate_prediction_id) {
+  if (isRunning && generation.external_id) {
     try {
-      const replicate = getReplicate();
-      const prediction = await replicate.predictions.get(
-        generation.replicate_prediction_id
+      const provider = getProvider();
+      const result = await provider.check(
+        generation.external_id,
+        generation.type
       );
-      await finalizeGeneration(generation, prediction);
+      await finalizeGeneration(generation, result);
     } catch {
-      // Replicate geçici hatası — mevcut durumu döndürmeye devam et
+      // Sağlayıcı geçici hatası — mevcut durumu döndürmeye devam et
     }
 
     const { data: refreshed } = await supabase

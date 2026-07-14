@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import type { Prediction } from "replicate";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { finalizeGeneration } from "@/lib/generations/finalize";
+import { predictionToResult } from "@/lib/providers/replicate";
 import type { Generation } from "@/lib/types";
 
 /**
  * Replicate webhook — üretim tamamlanınca çağrılır (yalnızca prod'da,
- * NEXT_PUBLIC_SITE_URL tanımlıysa). Yerelde polling devreye girer.
+ * NEXT_PUBLIC_SITE_URL tanımlıysa). Diğer sağlayıcılar polling kullanır.
  */
 export async function POST(request: Request) {
   const url = new URL(request.url);
@@ -31,10 +32,10 @@ export async function POST(request: Request) {
   const generation = data as Generation | null;
 
   // Sahtecilik koruması: kayıtla eşleşmeyen prediction id reddedilir
-  if (!generation || generation.replicate_prediction_id !== prediction.id) {
+  if (!generation || generation.external_id !== prediction.id) {
     return NextResponse.json({ success: false, error: "Eşleşme yok." }, { status: 404 });
   }
 
-  await finalizeGeneration(generation, prediction);
+  await finalizeGeneration(generation, predictionToResult(prediction));
   return NextResponse.json({ success: true });
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getReplicate, MODELS } from "@/lib/replicate";
+import { getProvider } from "@/lib/providers";
 import type { GenerationType } from "@/lib/types";
 
 const MAX_PROMPT_LENGTH = 2000;
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: "Proje bulunamadı." }, { status: 404 });
   }
 
-  const model = MODELS[type];
+  const provider = getProvider();
 
   const { data: generation, error: insertError } = await supabase
     .from("generations")
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       user_id: user.id,
       prompt,
       type,
-      model,
+      model: provider.name,
       status: "pending",
     })
     .select("*")
@@ -65,28 +65,20 @@ export async function POST(request: Request) {
   }
 
   try {
-    const replicate = getReplicate();
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-
-    const prediction = await replicate.predictions.create({
-      model,
-      input: { prompt },
-      ...(siteUrl
-        ? {
-            webhook: `${siteUrl}/api/webhooks/replicate?generationId=${generation.id}`,
-            webhook_events_filter: ["completed" as const],
-          }
-        : {}),
+    const { externalId, model } = await provider.start({
+      prompt,
+      type,
+      generationId: generation.id,
     });
 
     await supabase
       .from("generations")
-      .update({ replicate_prediction_id: prediction.id, status: "processing" })
+      .update({ external_id: externalId, model, status: "processing" })
       .eq("id", generation.id);
 
     return NextResponse.json({
       success: true,
-      data: { id: generation.id, predictionId: prediction.id },
+      data: { id: generation.id, externalId },
     });
   } catch (error: unknown) {
     const message =
@@ -95,6 +87,6 @@ export async function POST(request: Request) {
       .from("generations")
       .update({ status: "failed", error_message: message })
       .eq("id", generation.id);
-    return NextResponse.json({ success: false, error: "Üretim başlatılamadı." }, { status: 502 });
+    return NextResponse.json({ success: false, error: message }, { status: 502 });
   }
 }

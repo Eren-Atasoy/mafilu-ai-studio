@@ -1,40 +1,47 @@
-import type { Prediction } from "replicate";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { OUTPUT_EXTENSIONS } from "@/lib/replicate";
+import type { CheckResult } from "@/lib/providers/types";
 import type { Generation, GenerationType } from "@/lib/types";
 
 const BUCKET = "generations";
 
-function extractOutputUrl(output: Prediction["output"]): string | null {
-  if (typeof output === "string") return output;
-  if (Array.isArray(output) && typeof output[0] === "string") return output[0];
-  return null;
+const DEFAULT_EXTENSIONS: Record<GenerationType, string> = {
+  video: "mp4",
+  image: "png",
+};
+
+function resolveExtension(url: string, type: GenerationType): string {
+  const match = /\.([a-z0-9]{2,5})(?:\?|$)/i.exec(new URL(url).pathname);
+  if (match) return match[1].toLowerCase();
+  // ComfyUI /view?filename=x.png gibi query tabanlı adresler
+  const filename = new URL(url).searchParams.get("filename");
+  const queryMatch = filename ? /\.([a-z0-9]{2,5})$/i.exec(filename) : null;
+  return queryMatch ? queryMatch[1].toLowerCase() : DEFAULT_EXTENSIONS[type];
 }
 
 /**
- * Replicate prediction'ının nihai durumunu generations tablosuna işler.
- * Başarılıysa çıktıyı Supabase Storage'a kopyalar ve kalıcı URL yazar.
- * Hem webhook hem polling yolundan çağrılır — idempotenttir.
+ * Sağlayıcı sonucunu generations tablosuna işler. Başarılıysa çıktıyı
+ * Supabase Storage'a kopyalar ve kalıcı URL yazar. Webhook ve polling
+ * yollarının ikisinden de çağrılır — idempotenttir.
  */
 export async function finalizeGeneration(
   generation: Pick<Generation, "id" | "user_id" | "type" | "status">,
-  prediction: Prediction
+  result: CheckResult
 ): Promise<void> {
   const supabase = createAdminClient();
 
-  if (prediction.status === "failed" || prediction.status === "canceled") {
+  if (result.status === "failed") {
     await supabase
       .from("generations")
       .update({
         status: "failed",
-        error_message: String(prediction.error ?? "Üretim başarısız oldu."),
+        error_message: result.error ?? "Üretim başarısız oldu.",
       })
       .eq("id", generation.id)
-      .eq("status", "processing");
+      .in("status", ["pending", "processing"]);
     return;
   }
 
-  if (prediction.status !== "succeeded") {
+  if (result.status !== "succeeded" || !result.outputUrl) {
     return; // hâlâ çalışıyor
   }
 
@@ -42,16 +49,7 @@ export async function finalizeGeneration(
     return; // daha önce finalize edilmiş
   }
 
-  const sourceUrl = extractOutputUrl(prediction.output);
-  if (!sourceUrl) {
-    await supabase
-      .from("generations")
-      .update({ status: "failed", error_message: "Model çıktı üretmedi." })
-      .eq("id", generation.id);
-    return;
-  }
-
-  const response = await fetch(sourceUrl);
+  const response = await fetch(result.outputUrl);
   if (!response.ok) {
     await supabase
       .from("generations")
@@ -60,11 +58,11 @@ export async function finalizeGeneration(
     return;
   }
 
-  const extension = OUTPUT_EXTENSIONS[generation.type as GenerationType];
+  const extension = resolveExtension(result.outputUrl, generation.type as GenerationType);
   const path = `${generation.user_id}/${generation.id}.${extension}`;
   const contentType =
     response.headers.get("content-type") ??
-    (generation.type === "video" ? "video/mp4" : "image/webp");
+    (generation.type === "video" ? "video/mp4" : "image/png");
 
   const { error: uploadError } = await supabase.storage
     .from(BUCKET)

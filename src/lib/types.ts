@@ -21,7 +21,7 @@ export interface Generation {
   prompt: string;
   type: GenerationType;
   model: string;
-  replicate_prediction_id: string | null;
+  external_id: string | null;
   status: GenerationStatus;
   output_url: string | null;
   error_message: string | null;

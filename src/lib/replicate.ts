@@ -7,11 +7,6 @@ export const MODELS: Record<GenerationType, `${string}/${string}`> = {
   image: "black-forest-labs/flux-schnell",
 };
 
-export const OUTPUT_EXTENSIONS: Record<GenerationType, string> = {
-  video: "mp4",
-  image: "webp",
-};
-
 let client: Replicate | null = null;
 
 export function getReplicate(): Replicate {
