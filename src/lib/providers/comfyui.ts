@@ -6,6 +6,7 @@ import type {
   StartArgs,
   StartResult,
 } from "./types";
+import type { GenerationSettings } from "./types";
 import type { GenerationType } from "@/lib/types";
 
 const WORKFLOW_DIR = path.join(process.cwd(), "comfy", "workflows");
@@ -21,24 +22,36 @@ function getBaseUrl(): string {
   return process.env.COMFYUI_URL ?? "http://127.0.0.1:8188";
 }
 
-async function loadWorkflow(type: GenerationType, prompt: string): Promise<string> {
-  const file = path.join(WORKFLOW_DIR, `${type}.json`);
+async function loadWorkflow(
+  type: GenerationType,
+  prompt: string,
+  settings: GenerationSettings
+): Promise<string> {
+  const variant = settings.quality === "max" ? "-max" : "";
+  const file = path.join(WORKFLOW_DIR, `${type}${variant}.json`);
   let template: string;
   try {
     template = await fs.readFile(file, "utf-8");
   } catch {
     throw new Error(
-      type === "video"
-        ? "Video workflow'u kurulu değil. docs/COMFYUI_SETUP.md rehberindeki LTX-Video adımlarını izleyip comfy/workflows/video.json dosyasını oluşturun."
-        : "Görsel workflow dosyası eksik: comfy/workflows/image.json"
+      settings.quality === "max"
+        ? `Maksimum kalite workflow'u eksik: comfy/workflows/${type}-max.json — docs/COMFYUI_SETUP.md rehberine bakın.`
+        : type === "video"
+          ? "Video workflow'u kurulu değil. docs/COMFYUI_SETUP.md rehberindeki LTX-Video adımlarını izleyip comfy/workflows/video.json dosyasını oluşturun."
+          : "Görsel workflow dosyası eksik: comfy/workflows/image.json"
     );
   }
 
   const escapedPrompt = JSON.stringify(prompt).slice(1, -1);
+  const escapedNegative = JSON.stringify(settings.negativePrompt).slice(1, -1);
   const seed = String(Math.floor(Math.random() * MAX_SEED));
   return template
     .replaceAll("__PROMPT__", escapedPrompt)
-    .replaceAll('"__SEED__"', seed);
+    .replaceAll("__NEGATIVE__", escapedNegative)
+    .replaceAll('"__SEED__"', seed)
+    .replaceAll('"__WIDTH__"', String(settings.width))
+    .replaceAll('"__HEIGHT__"', String(settings.height))
+    .replaceAll('"__FRAMES__"', String(settings.frames));
 }
 
 function pickOutputFile(
@@ -82,8 +95,8 @@ function pickOutputFile(
 export const comfyUIProvider: MediaProvider = {
   name: "comfyui",
 
-  async start({ prompt, type }: StartArgs): Promise<StartResult> {
-    const workflow = await loadWorkflow(type, prompt);
+  async start({ prompt, type, settings }: StartArgs): Promise<StartResult> {
+    const workflow = await loadWorkflow(type, prompt, settings);
 
     const response = await fetch(`${getBaseUrl()}/prompt`, {
       method: "POST",

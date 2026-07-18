@@ -3,9 +3,9 @@
     "class_type": "KSampler",
     "inputs": {
       "seed": "__SEED__",
-      "steps": 25,
-      "cfg": 7,
-      "sampler_name": "dpmpp_2m",
+      "steps": 8,
+      "cfg": 2.5,
+      "sampler_name": "dpmpp_sde",
       "scheduler": "karras",
       "denoise": 1,
       "model": ["4", 0],
@@ -17,14 +17,14 @@
   "4": {
     "class_type": "CheckpointLoaderSimple",
     "inputs": {
-      "ckpt_name": "dreamshaper_8.safetensors"
+      "ckpt_name": "dreamshaper_xl_turbo.safetensors"
     }
   },
   "5": {
     "class_type": "EmptyLatentImage",
     "inputs": {
-      "width": 512,
-      "height": 912,
+      "width": "__WIDTH__",
+      "height": "__HEIGHT__",
       "batch_size": 1
     }
   },
@@ -38,7 +38,7 @@
   "7": {
     "class_type": "CLIPTextEncode",
     "inputs": {
-      "text": "blurry, low quality, watermark, text, deformed",
+      "text": "__NEGATIVE__",
       "clip": ["4", 1]
     }
   },

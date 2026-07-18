@@ -1,10 +1,24 @@
 import type { GenerationType } from "@/lib/types";
 
+export type QualityMode = "fast" | "max";
+
+export interface GenerationSettings {
+  negativePrompt: string;
+  width: number;
+  height: number;
+  /** Sadece video için anlamlı */
+  frames: number;
+  /** fast: SDXL/LTX (saniyeler-dakika) — max: Flux/Wan (dakikalar, en kaliteli) */
+  quality: QualityMode;
+}
+
 export interface StartArgs {
   prompt: string;
   type: GenerationType;
   /** Webhook destekleyen sağlayıcılar için geri çağrı bağlamı */
   generationId: string;
+  /** Preset katmanından gelen üretim ayarları */
+  settings: GenerationSettings;
 }
 
 export interface StartResult {

@@ -14,12 +14,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { t } from "@/lib/i18n";
+import { DEFAULT_PRESET_ID, GENERATION_PRESETS } from "@/lib/presets";
+import type { QualityMode } from "@/lib/providers/types";
 import type { GenerationType } from "@/lib/types";
 
 export function GenerationForm({ projectId }: { projectId: string }) {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
   const [type, setType] = useState<GenerationType>("video");
+  const [presetId, setPresetId] = useState(DEFAULT_PRESET_ID);
+  const [quality, setQuality] = useState<QualityMode>("fast");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +37,7 @@ export function GenerationForm({ projectId }: { projectId: string }) {
       const response = await fetch("/api/generations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId, prompt: prompt.trim(), type }),
+        body: JSON.stringify({ projectId, prompt: prompt.trim(), type, presetId, quality }),
       });
       const result = await response.json();
       if (!result.success) {
@@ -64,20 +68,52 @@ export function GenerationForm({ projectId }: { projectId: string }) {
         />
       </div>
       <div className="flex items-end justify-between gap-4">
-        <div className="space-y-2">
-          <Label>{t.studio.typeLabel}</Label>
-          <Select
-            value={type}
-            onValueChange={(value) => setType(value as GenerationType)}
-          >
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="video">{t.studio.typeVideo}</SelectItem>
-              <SelectItem value="image">{t.studio.typeImage}</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex gap-4">
+          <div className="space-y-2">
+            <Label>{t.studio.typeLabel}</Label>
+            <Select
+              value={type}
+              onValueChange={(value) => setType(value as GenerationType)}
+            >
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="video">{t.studio.typeVideo}</SelectItem>
+                <SelectItem value="image">{t.studio.typeImage}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>{t.studio.presetLabel}</Label>
+            <Select value={presetId} onValueChange={setPresetId}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {GENERATION_PRESETS.map((preset) => (
+                  <SelectItem key={preset.id} value={preset.id}>
+                    {preset.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>{t.studio.qualityLabel}</Label>
+            <Select
+              value={quality}
+              onValueChange={(value) => setQuality(value as QualityMode)}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fast">{t.studio.qualityFast}</SelectItem>
+                <SelectItem value="max">{t.studio.qualityMax}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <Button type="submit" disabled={isSubmitting || !prompt.trim()}>
           <Sparkles className="size-4" />

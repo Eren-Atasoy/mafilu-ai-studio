@@ -43,6 +43,10 @@ export const tr = {
     promptPlaceholder:
       "Örn: Gün batımında sahilde koşan bir golden retriever, sinematik",
     typeLabel: "Tür",
+    presetLabel: "Kategori",
+    qualityLabel: "Kalite",
+    qualityFast: "Hızlı",
+    qualityMax: "Maksimum (yavaş)",
     typeVideo: "Video",
     typeImage: "Görsel",
     generate: "Üret",

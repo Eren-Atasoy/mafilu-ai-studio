@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getProvider } from "@/lib/providers";
+import { getPreset } from "@/lib/presets";
+import { enhancePrompt } from "@/lib/prompts/enhance";
 import type { GenerationType } from "@/lib/types";
 
 const MAX_PROMPT_LENGTH = 2000;
@@ -9,6 +11,8 @@ interface CreateGenerationBody {
   projectId?: string;
   prompt?: string;
   type?: GenerationType;
+  presetId?: string;
+  quality?: string;
 }
 
 export async function POST(request: Request) {
@@ -65,10 +69,23 @@ export async function POST(request: Request) {
   }
 
   try {
+    // Türkçe promptu İngilizce sinematik prompta çevir, sonra preset stiliyle sar
+    const preset = getPreset(body.presetId);
+    const enhanced = await enhancePrompt(prompt, type);
+    const finalPrompt = preset.promptTemplate.replace("{prompt}", enhanced);
+    const dimensions = type === "video" ? preset.video : preset.image;
+
     const { externalId, model } = await provider.start({
-      prompt,
+      prompt: finalPrompt,
       type,
       generationId: generation.id,
+      settings: {
+        negativePrompt: preset.negativePrompt,
+        width: dimensions.width,
+        height: dimensions.height,
+        frames: type === "video" ? preset.video.frames : 1,
+        quality: body.quality === "max" ? "max" : "fast",
+      },
     });
 
     await supabase
