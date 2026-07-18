@@ -48,15 +48,20 @@ function extractFalOutput(payload: FalResultPayload): string | undefined {
 export const falProvider: MediaProvider = {
   name: "fal",
 
-  async start({ prompt, type }: StartArgs): Promise<StartResult> {
+  async start({ prompt, type, sourceImageUrl }: StartArgs): Promise<StartResult> {
     const model = getModel(type);
+    // Video görselden üretilir — fal'ın image-to-video modelleri image_url bekler
+    const payload =
+      type === "video" && sourceImageUrl
+        ? { prompt, image_url: sourceImageUrl }
+        : { prompt };
     const response = await fetch(`${QUEUE_BASE}/${model}`, {
       method: "POST",
       headers: {
         Authorization: `Key ${getApiKey()}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {

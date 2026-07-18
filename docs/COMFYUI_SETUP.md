@@ -32,26 +32,28 @@
 ✅ Bu kadar — **görsel üretimi hazır.** Uygulamadan "Görsel" seçip prompt yazınca
 ComfyUI kuyruğuna düşer, çıktı Supabase Storage'a kopyalanır.
 
-## 3. Video Modeli (LTX-Video — 8 GB VRAM'de çalışan en pratik seçenek)
+## 3. Video Modeli (Wan 2.1 I2V — görselden video, tutarlılık için)
 
-LTX-Video workflow'ları kişisel kuruluma göre değiştiği için repoya hazır
-`video.json` koymadık — kendi çalışan workflow'unu export edeceksin:
+Video üretimi **görselden** yapılır (image-to-video): önce görsel üretilir,
+beğenilen görsel galerideki **"Videoya Dönüştür"** ile canlandırılır. Bu akış,
+prompttan video üretmeye göre çok daha tutarlı sonuç verir — özellikle kısa
+film / çizgi film gibi sahne ve karakter tutarlılığı gereken işlerde.
 
-1. ComfyUI arayüzünde: **Workflow → Browse Templates → Video** altından
-   **LTX-Video (Text to Video)** şablonunu aç.
-2. Şablon eksik modelleri söyler; genellikle şunlar gerekir:
-   - `ltx-video-2b-v0.9.5.safetensors` → `models\checkpoints\`
-   - `t5xxl_fp8_e4m3fn.safetensors` (metin kodlayıcı) → `models\text_encoders\`
-   (ComfyUI'nin model indirme diyaloğu linkleri verir; toplam ~8 GB.)
-3. Şablonu bir kez çalıştırıp video aldığından emin ol.
-   8 GB VRAM için öneri: çözünürlük **768×512**, kare sayısı **97 (≈4 sn)** civarında tut.
-4. Prompt kutusundaki metni birebir şu yer tutucuyla değiştir: `__PROMPT__`
-   Varsa seed alanına da `__SEED__` yazabilirsin (opsiyonel).
-5. **Menü → Workflow → Export (API)** ile JSON'u indir ve repoda
-   `comfy/workflows/video.json` olarak kaydet.
+Gerekli modeller (GGUF eklentisi için bkz. 3.6):
 
-✅ Artık uygulamadan "Video" üretimi de yerelde çalışır. `video.json` yoksa
-uygulama bunu açıklayan Türkçe bir hata gösterir (pipeline kırılmaz).
+- `wan2.1-i2v-14b-480p-Q4_K_S.gguf` (city96/Wan2.1-I2V-14B-480P-gguf) → `models\unet\` (~9,6 GB)
+- `clip_vision_h.safetensors` (Comfy-Org/Wan_2.1_ComfyUI_repackaged) → `models\clip_vision\` (~1,2 GB)
+- `umt5_xxl_fp8_e4m3fn_scaled.safetensors` (aynı repo) → `models\text_encoders\` (~6,3 GB)
+- `wan_2.1_vae.safetensors` (aynı repo) → `models\vae\`
+- LightX2V distill LoRA (Kijai/WanVideo_comfy) → `models\loras\wan21_lightx2v_distill_rank32.safetensors`
+
+Workflow repoda hazır: `comfy/workflows/video-from-image.json` — 81 kare,
+16 fps (~5 sn), 4 adım (LightX2V sayesinde). Süre: 8 GB VRAM'de ~8-12 dk.
+Video boyutu kaynak görselin yönelimine göre otomatik seçilir
+(yatay 768×512, dikey 512×896, kare 640×640).
+
+✅ Uygulamadaki akış: Görsel üret → galeride "Videoya Dönüştür" → hareket
+açıklaması yaz → video, görselin ilk karesinden üretilir.
 
 ## 3.5 Prompt Zenginleştirme (şiddetle önerilir, ücretsiz)
 
@@ -66,37 +68,29 @@ Böylece kullanıcının Türkçe promptu, üretimden önce otomatik olarak deta
 İngilizce sinematik prompta çevrilir. Anahtar yoksa prompt olduğu gibi geçer
 (pipeline kırılmaz) ama kalite belirgin düşer.
 
-## 3.6 Maksimum Kalite Modu (opsiyonel, ~25 GB)
+## 3.6 GGUF Eklentisi ve Maksimum Kalite Görsel (FLUX)
 
-Formdaki **Kalite → Maksimum** seçeneği, 8 GB VRAM'de GGUF quantization +
-RAM offload ile çalışan en iyi açık modelleri kullanır (yavaş ama en kaliteli):
-
-| Tür | Model | Süre (yaklaşık) |
-|---|---|---|
-| Görsel | FLUX.1-dev (GGUF Q5) | 1-3 dk |
-| Video | Wan 2.1 14B (GGUF Q4) + LightX2V 4-adım LoRA | 5-15 dk |
-
-Kurulum:
+Wan I2V ve FLUX modelleri GGUF formatında çalışır (8 GB VRAM'e quantization +
+RAM offload ile sığarlar):
 
 1. `custom_nodes\` altına [ComfyUI-GGUF](https://github.com/city96/ComfyUI-GGUF)
    klonla ve gömülü Python'a `pip install gguf` yap.
-2. Modelleri indir:
+2. Formdaki **Kalite → Maksimum** görseli FLUX.1-dev ile üretir (~2-3 dk;
+   Hızlı mod SDXL Turbo ~15 sn). Gerekli dosyalar:
    - `flux1-dev-Q5_K_S.gguf` (city96/FLUX.1-dev-gguf) → `models\unet\`
    - `clip_l.safetensors` (comfyanonymous/flux_text_encoders) → `models\text_encoders\`
-   - `ae.safetensors` (FLUX.1-schnell reposundan) → `models\vae\flux_ae.safetensors`
-   - `wan2.1-t2v-14b-Q4_K_S.gguf` (city96/Wan2.1-T2V-14B-gguf) → `models\unet\`
-   - `umt5_xxl_fp8_e4m3fn_scaled.safetensors` (Comfy-Org/Wan_2.1_ComfyUI_repackaged) → `models\text_encoders\`
-   - `wan_2.1_vae.safetensors` (aynı repo) → `models\vae\`
-   - LightX2V distill LoRA (Kijai/WanVideo_comfy) → `models\loras\wan21_lightx2v_distill_rank32.safetensors`
+   - `t5xxl_fp8_e4m3fn.safetensors` (aynı repo) → `models\text_encoders\`
+   - `ae.safetensors` (Flux VAE, açık aynadan) → `models\vae\flux_ae.safetensors`
 3. ComfyUI'yi yeniden başlat. Workflow'lar repoda hazır:
-   `comfy/workflows/image-max.json` ve `video-max.json`.
+   `comfy/workflows/image.json`, `image-max.json`, `video-from-image.json`.
 
 ## 4. Sık Karşılaşılanlar
 
 | Belirti | Sebep / Çözüm |
 |---|---|
 | Kart "Başarısız: ComfyUI isteği reddetti" | ComfyUI kapalı — `run_nvidia_gpu.bat` çalışıyor mu? |
-| Kart "Başarısız: ... video.json dosyasını oluşturun" | Adım 3 tamamlanmadı. |
+| Kart "Başarısız: Workflow dosyası eksik" | Repo güncel mi? `comfy/workflows/` klasörünü kontrol et. |
+| "Video üretimi için kaynak görsel gerekli" | Video, galerideki bir görselden "Videoya Dönüştür" ile başlatılır. |
 | Üretim çok yavaş / OOM | Çözünürlüğü ve kare sayısını düşür; ComfyUI'yi `--lowvram` ile başlat. |
 | Çıktı geldi ama galeri boş | Workflow'da SaveImage/SaveVideo düğümü olmalı (Preview yetmez). |
 
@@ -107,7 +101,7 @@ Kurulum:
 ```
 MEDIA_PROVIDER=fal
 FAL_KEY=<fal.ai anahtarın>
-FAL_VIDEO_MODEL=<seçilen model, örn. fal-ai/ltx-video>
+FAL_VIDEO_MODEL=<image-to-video modeli, örn. fal-ai/kling-video/v1.6/standard/image-to-video>
 FAL_IMAGE_MODEL=<örn. fal-ai/flux/schnell>
 ```
 

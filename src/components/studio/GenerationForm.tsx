@@ -16,12 +16,10 @@ import {
 import { t } from "@/lib/i18n";
 import { DEFAULT_PRESET_ID, GENERATION_PRESETS } from "@/lib/presets";
 import type { QualityMode } from "@/lib/providers/types";
-import type { GenerationType } from "@/lib/types";
 
 export function GenerationForm({ projectId }: { projectId: string }) {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
-  const [type, setType] = useState<GenerationType>("video");
   const [presetId, setPresetId] = useState(DEFAULT_PRESET_ID);
   const [quality, setQuality] = useState<QualityMode>("fast");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,7 +35,13 @@ export function GenerationForm({ projectId }: { projectId: string }) {
       const response = await fetch("/api/generations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId, prompt: prompt.trim(), type, presetId, quality }),
+        body: JSON.stringify({
+          projectId,
+          prompt: prompt.trim(),
+          type: "image",
+          presetId,
+          quality,
+        }),
       });
       const result = await response.json();
       if (!result.success) {
@@ -69,21 +73,6 @@ export function GenerationForm({ projectId }: { projectId: string }) {
       </div>
       <div className="flex items-end justify-between gap-4">
         <div className="flex gap-4">
-          <div className="space-y-2">
-            <Label>{t.studio.typeLabel}</Label>
-            <Select
-              value={type}
-              onValueChange={(value) => setType(value as GenerationType)}
-            >
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="video">{t.studio.typeVideo}</SelectItem>
-                <SelectItem value="image">{t.studio.typeImage}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
           <div className="space-y-2">
             <Label>{t.studio.presetLabel}</Label>
             <Select value={presetId} onValueChange={setPresetId}>
@@ -117,9 +106,10 @@ export function GenerationForm({ projectId }: { projectId: string }) {
         </div>
         <Button type="submit" disabled={isSubmitting || !prompt.trim()}>
           <Sparkles className="size-4" />
-          {isSubmitting ? t.studio.generating : t.studio.generate}
+          {isSubmitting ? t.studio.generating : t.studio.generateImage}
         </Button>
       </div>
+      <p className="text-xs text-muted-foreground">{t.studio.imageFirstHint}</p>
       {error && (
         <p role="alert" className="text-sm text-destructive">
           {error}

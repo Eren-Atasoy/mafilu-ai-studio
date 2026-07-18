@@ -22,23 +22,25 @@ function getBaseUrl(): string {
   return process.env.COMFYUI_URL ?? "http://127.0.0.1:8188";
 }
 
+function workflowFileName(type: GenerationType, settings: GenerationSettings): string {
+  // Video her zaman görselden üretilir (image-to-video) — kalite modu görsele özel
+  if (type === "video") return "video-from-image.json";
+  return settings.quality === "max" ? "image-max.json" : "image.json";
+}
+
 async function loadWorkflow(
   type: GenerationType,
   prompt: string,
   settings: GenerationSettings
 ): Promise<string> {
-  const variant = settings.quality === "max" ? "-max" : "";
-  const file = path.join(WORKFLOW_DIR, `${type}${variant}.json`);
+  const fileName = workflowFileName(type, settings);
+  const file = path.join(WORKFLOW_DIR, fileName);
   let template: string;
   try {
     template = await fs.readFile(file, "utf-8");
   } catch {
     throw new Error(
-      settings.quality === "max"
-        ? `Maksimum kalite workflow'u eksik: comfy/workflows/${type}-max.json — docs/COMFYUI_SETUP.md rehberine bakın.`
-        : type === "video"
-          ? "Video workflow'u kurulu değil. docs/COMFYUI_SETUP.md rehberindeki LTX-Video adımlarını izleyip comfy/workflows/video.json dosyasını oluşturun."
-          : "Görsel workflow dosyası eksik: comfy/workflows/image.json"
+      `Workflow dosyası eksik: comfy/workflows/${fileName} — docs/COMFYUI_SETUP.md rehberine bakın.`
     );
   }
 
@@ -52,6 +54,39 @@ async function loadWorkflow(
     .replaceAll('"__WIDTH__"', String(settings.width))
     .replaceAll('"__HEIGHT__"', String(settings.height))
     .replaceAll('"__FRAMES__"', String(settings.frames));
+}
+
+/**
+ * Kaynak görseli (Supabase Storage) indirip ComfyUI'nin input klasörüne
+ * yükler; workflow'daki LoadImage düğümünün kullanacağı dosya adını döndürür.
+ */
+async function uploadSourceImage(sourceImageUrl: string): Promise<string> {
+  const response = await fetch(sourceImageUrl);
+  if (!response.ok) {
+    throw new Error(`Kaynak görsel indirilemedi (HTTP ${response.status}).`);
+  }
+
+  const blob = await response.blob();
+  const extension = sourceImageUrl.toLowerCase().includes(".webp") ? "webp" : "png";
+  const fileName = `mafilu-src-${crypto.randomUUID()}.${extension}`;
+
+  const form = new FormData();
+  form.append("image", blob, fileName);
+  form.append("overwrite", "true");
+
+  const upload = await fetch(`${getBaseUrl()}/upload/image`, {
+    method: "POST",
+    body: form,
+  });
+  if (!upload.ok) {
+    throw new Error(`ComfyUI görsel yüklemesini reddetti (HTTP ${upload.status}).`);
+  }
+
+  const data = (await upload.json()) as { name?: string };
+  if (!data.name) {
+    throw new Error("ComfyUI yüklenen görselin adını döndürmedi.");
+  }
+  return data.name;
 }
 
 function pickOutputFile(
@@ -95,8 +130,21 @@ function pickOutputFile(
 export const comfyUIProvider: MediaProvider = {
   name: "comfyui",
 
-  async start({ prompt, type, settings }: StartArgs): Promise<StartResult> {
-    const workflow = await loadWorkflow(type, prompt, settings);
+  async start({ prompt, type, settings, sourceImageUrl }: StartArgs): Promise<StartResult> {
+    let workflow = await loadWorkflow(type, prompt, settings);
+
+    if (type === "video") {
+      if (!sourceImageUrl) {
+        throw new Error(
+          "Video üretimi için kaynak görsel gerekli — önce bir görsel üretip 'Videoya Dönüştür'ü kullanın."
+        );
+      }
+      const imageName = await uploadSourceImage(sourceImageUrl);
+      workflow = workflow.replaceAll(
+        "__IMAGE__",
+        JSON.stringify(imageName).slice(1, -1)
+      );
+    }
 
     const response = await fetch(`${getBaseUrl()}/prompt`, {
       method: "POST",

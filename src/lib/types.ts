@@ -25,6 +25,7 @@ export interface Generation {
   status: GenerationStatus;
   output_url: string | null;
   error_message: string | null;
+  source_generation_id: string | null;
   created_at: string;
 }
 

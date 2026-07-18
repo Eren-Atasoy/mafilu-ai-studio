@@ -5,6 +5,7 @@ import { Loader2, ImageOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { t } from "@/lib/i18n";
+import { ImageToVideoDialog } from "./ImageToVideoDialog";
 import type { Generation, GenerationStatus } from "@/lib/types";
 
 const POLL_INTERVAL_MS = 5000;
@@ -122,6 +123,13 @@ function GenerationCard({ generation }: { generation: Generation }) {
             {generation.error_message}
           </p>
         )}
+        {generation.type === "image" &&
+          generation.status === "succeeded" &&
+          generation.output_url && (
+            <div className="mt-3">
+              <ImageToVideoDialog source={generation} />
+            </div>
+          )}
       </CardContent>
     </Card>
   );

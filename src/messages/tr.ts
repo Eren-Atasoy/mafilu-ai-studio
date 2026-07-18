@@ -50,6 +50,17 @@ export const tr = {
     typeVideo: "Video",
     typeImage: "Görsel",
     generate: "Üret",
+    generateImage: "Görsel Üret",
+    imageFirstHint:
+      "Önce görsel üret — beğendiğin görseli galerideki 'Videoya Dönüştür' ile canlandır. Bu akış sahne ve karakter tutarlılığı sağlar.",
+    toVideo: "Videoya Dönüştür",
+    toVideoTitle: "Görselden video üret",
+    toVideoDescription:
+      "Bu görsel videonun ilk karesi olur. Sahnede nasıl bir hareket istediğini anlat.",
+    toVideoConfirm: "Videoyu Üret",
+    motionPromptLabel: "Hareket açıklaması",
+    motionPromptPlaceholder:
+      "Örn: Kamera yavaşça yaklaşırken buhar yükselsin, ışık hafifçe titresin",
     generating: "Üretiliyor...",
     generationFailed: "Üretim başarısız",
     galleryTitle: "Üretimler",

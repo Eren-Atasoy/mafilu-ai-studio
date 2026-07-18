@@ -19,6 +19,8 @@ export interface StartArgs {
   generationId: string;
   /** Preset katmanından gelen üretim ayarları */
   settings: GenerationSettings;
+  /** Video üretiminde ilk kare olarak kullanılacak kaynak görselin URL'i */
+  sourceImageUrl?: string;
 }
 
 export interface StartResult {

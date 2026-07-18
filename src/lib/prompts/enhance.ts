@@ -23,8 +23,8 @@ interface GeminiResponse {
 function buildInstruction(prompt: string, type: GenerationType): string {
   const target =
     type === "video"
-      ? "a text-to-video model (LTX-Video). Describe the scene cinematically in 3-5 sentences: subject, action, camera movement, lighting, atmosphere. Motion must be explicit."
-      : "a text-to-image model (SDXL). Describe the scene in one dense paragraph: subject, composition, lighting, style, fine details.";
+      ? "an image-to-video model (Wan 2.1) that animates an existing image. Describe ONLY the motion in 2-4 sentences: how subjects move, camera movement, atmosphere changes. Do not re-describe static scene contents."
+      : "a text-to-image model. Describe the scene in one dense paragraph: subject, composition, lighting, style, fine details.";
 
   return [
     `Rewrite the user's idea as a high-quality English prompt for ${target}`,
