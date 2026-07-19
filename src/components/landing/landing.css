@@ -1,0 +1,180 @@
+/* ============================================================
+   Mafilu Landing — Sketchpunk Retro-Analog tasarım sistemi
+   Take On Me karakalem × Mr. Robot Fun Society arcade
+   Tüm kurallar .landing kapsamındadır; uygulama token'larına dokunmaz.
+   ============================================================ */
+
+.landing {
+  /* Zemin: saf siyah değil — kömür + hafif kâğıt sıcaklığı */
+  --lp-bg: oklch(0.17 0.008 95);
+  --lp-bg-deep: oklch(0.12 0.006 95);
+  --lp-paper: oklch(0.22 0.01 95);
+  --lp-ink: oklch(0.93 0.015 95);
+  --lp-ink-dim: oklch(0.68 0.012 95);
+  --lp-pencil: oklch(0.55 0.01 95);
+
+  /* CRT fosfor yeşili + amber */
+  --lp-phosphor: oklch(0.85 0.25 145);
+  --lp-phosphor-dim: oklch(0.6 0.16 145);
+  --lp-amber: oklch(0.8 0.16 75);
+
+  --lp-font-crt: var(--font-crt), monospace;
+  --lp-font-sketch: var(--font-sketch), cursive;
+  --lp-font-body: var(--font-landing-body), sans-serif;
+
+  background-color: var(--lp-bg);
+  color: var(--lp-ink);
+  font-family: var(--lp-font-body);
+  overflow-x: clip;
+}
+
+/* Kâğıt dokusu — SVG fractal noise, data URI (dış istek yok) */
+.lp-paper-texture {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+/* CRT tarama çizgileri */
+.lp-scanlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.14;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    oklch(0 0 0 / 0.7) 3px,
+    transparent 4px
+  );
+}
+
+/* 12-fps sketch titremesi — klasik animasyon "boil" hissi */
+@keyframes lp-boil {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(0.4px, -0.5px) rotate(0.12deg); }
+  50% { transform: translate(-0.5px, 0.3px) rotate(-0.1deg); }
+  75% { transform: translate(0.3px, 0.4px) rotate(0.08deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.lp-boil {
+  animation: lp-boil 0.4s steps(2, jump-none) infinite;
+}
+
+.lp-boil-slow {
+  animation: lp-boil 0.65s steps(3, jump-none) infinite;
+}
+
+/* Fosfor glow yardımcıları */
+.lp-glow-phosphor {
+  text-shadow:
+    0 0 6px oklch(0.85 0.25 145 / 0.55),
+    0 0 24px oklch(0.85 0.25 145 / 0.3),
+    0 0 64px oklch(0.85 0.25 145 / 0.18);
+}
+
+.lp-glow-amber {
+  text-shadow:
+    0 0 6px oklch(0.8 0.16 75 / 0.55),
+    0 0 24px oklch(0.8 0.16 75 / 0.28);
+}
+
+/* CRT ekran parlaması (flash) */
+@keyframes lp-flash {
+  0% { opacity: 0; }
+  55% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Statik parazit — intro TV ekranları */
+@keyframes lp-static-shift {
+  0% { background-position: 0 0; }
+  100% { background-position: 120px 80px; }
+}
+
+.lp-static {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23s)'/%3E%3C/svg%3E");
+  animation: lp-static-shift 0.28s steps(4, jump-none) infinite;
+}
+
+/* Terminal imleci */
+@keyframes lp-cursor-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.lp-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1em;
+  vertical-align: text-bottom;
+  background: var(--lp-phosphor);
+  animation: lp-cursor-blink 1.06s steps(1) infinite;
+  box-shadow: 0 0 10px oklch(0.85 0.25 145 / 0.6);
+}
+
+/* Sketch buton — el çizimi çerçeve hissi */
+.lp-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.5rem;
+  font-family: var(--lp-font-crt);
+  font-size: 1.25rem;
+  letter-spacing: 0.06em;
+  color: var(--lp-ink);
+  border: 1.5px solid var(--lp-ink);
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  background: transparent;
+  cursor: pointer;
+  transition: color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.lp-btn:hover,
+.lp-btn:focus-visible {
+  color: var(--lp-phosphor);
+  border-color: var(--lp-phosphor);
+  box-shadow:
+    0 0 12px oklch(0.85 0.25 145 / 0.35),
+    inset 0 0 12px oklch(0.85 0.25 145 / 0.12);
+  outline: none;
+}
+
+.lp-btn--solid {
+  background: var(--lp-phosphor);
+  color: var(--lp-bg-deep);
+  border-color: var(--lp-phosphor);
+}
+
+.lp-btn--solid:hover,
+.lp-btn--solid:focus-visible {
+  color: var(--lp-bg-deep);
+  box-shadow:
+    0 0 18px oklch(0.85 0.25 145 / 0.55),
+    0 0 48px oklch(0.85 0.25 145 / 0.25);
+}
+
+/* El çizimi kart çerçevesi (hafif eğik köşeler) */
+.lp-sketch-frame {
+  border: 1.5px solid var(--lp-pencil);
+  border-radius: 225px 15px 255px 15px / 15px 255px 15px 225px;
+  background: var(--lp-paper);
+}
+
+/* Reduced motion: tüm dekoratif animasyonlar kapanır */
+@media (prefers-reduced-motion: reduce) {
+  .lp-boil,
+  .lp-boil-slow,
+  .lp-static,
+  .lp-cursor {
+    animation: none;
+  }
+}
