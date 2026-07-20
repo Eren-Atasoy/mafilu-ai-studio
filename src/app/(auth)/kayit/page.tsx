@@ -10,6 +10,7 @@ export default function SignUpPage() {
     <AuthCard
       title={t.auth.signUpTitle}
       subtitle={t.auth.signUpSubtitle}
+      operation="YENİ_KAYIT"
       footerText={t.auth.hasAccount}
       footerLinkHref="/giris"
       footerLinkLabel={t.auth.signIn}

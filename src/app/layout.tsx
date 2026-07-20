@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Caveat, Geist, Geist_Mono, Space_Grotesk, VT323 } from "next/font/google";
+import { Bungee, Geist, Geist_Mono, Space_Grotesk, VT323 } from "next/font/google";
 import "./globals.css";
+import { PixelTransitionProvider } from "@/components/landing/PixelTransition";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 
@@ -14,16 +15,19 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Landing (sketchpunk) fontları — sadece .landing kapsamında kullanılır
+// Landing (The Void) fontları — sadece .landing kapsamında kullanılır
 const crtDisplay = VT323({
   variable: "--font-crt",
   weight: "400",
   subsets: ["latin"],
 });
 
-const sketchHand = Caveat({
-  variable: "--font-sketch",
-  subsets: ["latin"],
+// Neon tabela + dev tipografi — Bungee gerçek bir tabela (signage) fontu;
+// latin-ext Türkçe İ/Ç için şart
+const displayNeon = Bungee({
+  variable: "--font-display",
+  weight: "400",
+  subsets: ["latin", "latin-ext"],
 });
 
 const landingBody = Space_Grotesk({
@@ -49,11 +53,13 @@ export default function RootLayout({
         geistSans.variable,
         geistMono.variable,
         crtDisplay.variable,
-        sketchHand.variable,
+        displayNeon.variable,
         landingBody.variable
       )}
     >
-      <body className="flex min-h-full flex-col font-sans">{children}</body>
+      <body className="flex min-h-full flex-col font-sans">
+        <PixelTransitionProvider>{children}</PixelTransitionProvider>
+      </body>
     </html>
   );
 }

@@ -1,51 +1,49 @@
 /* ============================================================
-   Mafilu Landing — Sketchpunk Retro-Analog tasarım sistemi
-   Take On Me karakalem × Mr. Robot Fun Society arcade
+   Mafilu Landing — "The Void" tasarım sistemi
+   Netflix karanlığı × Mr. Robot merdiven-altı stüdyo
+   Palet: zift + neon kırmızı + fosfor beyazı + kül çizgi + lacivert
    Tüm kurallar .landing kapsamındadır; uygulama token'larına dokunmaz.
    ============================================================ */
 
 .landing {
-  /* Zemin: saf siyah değil — kömür + hafif kâğıt sıcaklığı */
-  --lp-bg: oklch(0.17 0.008 95);
-  --lp-bg-deep: oklch(0.12 0.006 95);
-  --lp-paper: oklch(0.22 0.01 95);
-  --lp-ink: oklch(0.93 0.015 95);
-  --lp-ink-dim: oklch(0.68 0.012 95);
-  --lp-pencil: oklch(0.55 0.01 95);
+  /* Zemin — #050505 karşılığı zift */
+  --lp-void: oklch(0.13 0 0);
+  --lp-void-deep: oklch(0.1 0 0);
 
-  /* CRT fosfor yeşili + amber */
-  --lp-phosphor: oklch(0.85 0.25 145);
-  --lp-phosphor-dim: oklch(0.6 0.16 145);
-  --lp-amber: oklch(0.8 0.16 75);
+  /* Neon kırmızı — #FF003C; türevler hue sabit, L/C oynar */
+  --lp-red: oklch(0.63 0.26 19);
+  --lp-red-hot: oklch(0.71 0.24 19);
+  --lp-red-dim: oklch(0.45 0.17 19);
+  --lp-red-ember: oklch(0.3 0.09 19); /* sönük neon tüpü */
 
+  /* Metin — #E0E0E0 fosfor beyazı */
+  --lp-ink: oklch(0.91 0 0);
+  --lp-ink-dim: oklch(0.64 0 0);
+
+  /* Çizgi — #333333 terminal külü */
+  --lp-line: oklch(0.32 0 0);
+
+  /* Derinlik — #30475E lacivert yüzeyler */
+  --lp-navy: oklch(0.4 0.055 250);
+  --lp-navy-deep: oklch(0.27 0.04 250);
+
+  --lp-font-display: var(--font-display), sans-serif;
   --lp-font-crt: var(--font-crt), monospace;
-  --lp-font-sketch: var(--font-sketch), cursive;
   --lp-font-body: var(--font-landing-body), sans-serif;
 
-  background-color: var(--lp-bg);
+  background-color: var(--lp-void);
   color: var(--lp-ink);
   font-family: var(--lp-font-body);
   overflow-x: clip;
 }
 
-/* Kâğıt dokusu — SVG fractal noise, data URI (dış istek yok) */
-.lp-paper-texture {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.5;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
-}
-
-/* CRT tarama çizgileri */
+/* CRT tarama çizgileri — merdiven-altı monitör hissi, çok sönük */
 .lp-scanlines {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 2;
-  opacity: 0.14;
+  opacity: 0.09;
   background: repeating-linear-gradient(
     to bottom,
     transparent 0px,
@@ -55,45 +53,7 @@
   );
 }
 
-/* 12-fps sketch titremesi — klasik animasyon "boil" hissi */
-@keyframes lp-boil {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  25% { transform: translate(0.4px, -0.5px) rotate(0.12deg); }
-  50% { transform: translate(-0.5px, 0.3px) rotate(-0.1deg); }
-  75% { transform: translate(0.3px, 0.4px) rotate(0.08deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
-}
-
-.lp-boil {
-  animation: lp-boil 0.4s steps(2, jump-none) infinite;
-}
-
-.lp-boil-slow {
-  animation: lp-boil 0.65s steps(3, jump-none) infinite;
-}
-
-/* Fosfor glow yardımcıları */
-.lp-glow-phosphor {
-  text-shadow:
-    0 0 6px oklch(0.85 0.25 145 / 0.55),
-    0 0 24px oklch(0.85 0.25 145 / 0.3),
-    0 0 64px oklch(0.85 0.25 145 / 0.18);
-}
-
-.lp-glow-amber {
-  text-shadow:
-    0 0 6px oklch(0.8 0.16 75 / 0.55),
-    0 0 24px oklch(0.8 0.16 75 / 0.28);
-}
-
-/* CRT ekran parlaması (flash) */
-@keyframes lp-flash {
-  0% { opacity: 0; }
-  55% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-/* Statik parazit — intro TV ekranları */
+/* Statik parazit — VHS kumlanması */
 @keyframes lp-static-shift {
   0% { background-position: 0 0; }
   100% { background-position: 120px 80px; }
@@ -115,66 +75,432 @@
   width: 0.55em;
   height: 1em;
   vertical-align: text-bottom;
-  background: var(--lp-phosphor);
+  background: var(--lp-red);
   animation: lp-cursor-blink 1.06s steps(1) infinite;
-  box-shadow: 0 0 10px oklch(0.85 0.25 145 / 0.6);
+  box-shadow: 0 0 10px oklch(0.63 0.26 19 / 0.6);
 }
 
-/* Sketch buton — el çizimi çerçeve hissi */
+/* ============================================================
+   Neon tabela — MAFILU
+   Harf iki katman: ::before sönük tüp (arka), .lp-neon-lit yanan
+   metin (ön, yalnızca opacity animasyonu → compositor dostu).
+   ============================================================ */
+
+.lp-neon-letter {
+  position: relative;
+  display: inline-block;
+  font-family: var(--lp-font-display);
+}
+
+.lp-neon-letter::before {
+  content: attr(data-letter);
+  position: absolute;
+  inset: 0;
+  color: var(--lp-red-ember);
+  text-shadow: none;
+}
+
+.lp-neon-lit {
+  position: relative;
+  display: inline-block;
+  color: var(--lp-red);
+  text-shadow:
+    0 0 4px oklch(0.63 0.26 19 / 0.9),
+    0 0 14px oklch(0.63 0.26 19 / 0.6),
+    0 0 42px oklch(0.63 0.26 19 / 0.35),
+    0 0 90px oklch(0.63 0.26 19 / 0.2);
+}
+
+/* Bozuk harf: düzensiz aralıklarla söner — steps(1), sadece opacity */
+@keyframes lp-neon-flicker {
+  0%, 41.9% { opacity: 1; }
+  42%, 43.4% { opacity: 0.15; }
+  43.5%, 45.9% { opacity: 1; }
+  46%, 46.9% { opacity: 0; }
+  47%, 47.6% { opacity: 0.9; }
+  47.7%, 48.9% { opacity: 0.1; }
+  49%, 78.9% { opacity: 1; }
+  79%, 79.7% { opacity: 0.2; }
+  79.8%, 100% { opacity: 1; }
+}
+
+.lp-neon-letter--broken .lp-neon-lit {
+  animation: lp-neon-flicker 7.3s steps(1) infinite;
+  animation-delay: 1.2s;
+}
+
+/* Nav'daki küçük tabela: flicker yok, sabit sönük glow */
+.lp-neon--static .lp-neon-lit {
+  animation: none;
+  text-shadow:
+    0 0 4px oklch(0.63 0.26 19 / 0.8),
+    0 0 16px oklch(0.63 0.26 19 / 0.4);
+}
+
+/* ============================================================
+   Butonlar — keskin köşe, kül çizgi, hover'da neon kırmızı
+   ============================================================ */
+
 .lp-btn {
   position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.65rem 1.5rem;
-  font-family: var(--lp-font-crt);
-  font-size: 1.25rem;
-  letter-spacing: 0.06em;
+  padding: 0.7rem 1.6rem;
+  font-family: var(--lp-font-body);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--lp-ink);
-  border: 1.5px solid var(--lp-ink);
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  border: 1px solid var(--lp-line);
+  border-radius: 2px;
   background: transparent;
   cursor: pointer;
-  transition: color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
 }
 
 .lp-btn:hover,
 .lp-btn:focus-visible {
-  color: var(--lp-phosphor);
-  border-color: var(--lp-phosphor);
+  color: var(--lp-red-hot);
+  border-color: var(--lp-red);
   box-shadow:
-    0 0 12px oklch(0.85 0.25 145 / 0.35),
-    inset 0 0 12px oklch(0.85 0.25 145 / 0.12);
+    0 0 14px oklch(0.63 0.26 19 / 0.3),
+    inset 0 0 10px oklch(0.63 0.26 19 / 0.08);
   outline: none;
 }
 
 .lp-btn--solid {
-  background: var(--lp-phosphor);
-  color: var(--lp-bg-deep);
-  border-color: var(--lp-phosphor);
+  background: var(--lp-red);
+  color: oklch(0.1 0 0);
+  border-color: var(--lp-red);
 }
 
 .lp-btn--solid:hover,
 .lp-btn--solid:focus-visible {
-  color: var(--lp-bg-deep);
+  background: var(--lp-red-hot);
+  color: oklch(0.1 0 0);
   box-shadow:
-    0 0 18px oklch(0.85 0.25 145 / 0.55),
-    0 0 48px oklch(0.85 0.25 145 / 0.25);
+    0 0 20px oklch(0.63 0.26 19 / 0.5),
+    0 0 56px oklch(0.63 0.26 19 / 0.22);
 }
 
-/* El çizimi kart çerçevesi (hafif eğik köşeler) */
-.lp-sketch-frame {
-  border: 1.5px solid var(--lp-pencil);
-  border-radius: 225px 15px 255px 15px / 15px 255px 15px 225px;
-  background: var(--lp-paper);
+/* Wireframe panel — terminal kartları */
+.lp-panel {
+  border: 1px solid var(--lp-line);
+  border-radius: 2px;
+  background: oklch(0.16 0.005 250);
+}
+
+.lp-panel--navy {
+  border-color: oklch(0.4 0.055 250 / 0.55);
+  background: oklch(0.2 0.025 250);
+}
+
+/* ============================================================
+   Piksel geçişi (sidewave) — hücreler GSAP ile scale edilir
+   ============================================================ */
+
+.lp-pixel-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  pointer-events: none;
+}
+
+/* Renkler token değil sabit: overlay .landing kapsamı dışında da yaşar
+   (route geçişinde landing unmount olur, ters dalga auth sayfasında oynar) */
+.lp-pixel-cell {
+  transform: scale(0);
+  background: oklch(0.1 0 0);
+  will-change: transform;
+}
+
+.lp-pixel-cell--red {
+  background: oklch(0.63 0.26 19);
+}
+
+/* ============================================================
+   Nav — kromsuz; köşeli parantez linki + REC butonu
+   ============================================================ */
+
+.lp-nav-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4em;
+  white-space: nowrap;
+  font-family: var(--lp-font-crt);
+  font-size: 1.125rem;
+  letter-spacing: 0.18em;
+  color: var(--lp-ink-dim);
+  transition: color 180ms ease;
+}
+
+.lp-nav-bracket {
+  color: var(--lp-line);
+  transition: color 180ms ease, transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lp-nav-link:hover,
+.lp-nav-link:focus-visible {
+  color: var(--lp-ink);
+  outline: none;
+}
+
+.lp-nav-link:hover .lp-nav-bracket,
+.lp-nav-link:focus-visible .lp-nav-bracket {
+  color: var(--lp-red);
+}
+
+.lp-nav-link:hover .lp-nav-bracket:first-child,
+.lp-nav-link:focus-visible .lp-nav-bracket:first-child {
+  transform: translateX(-4px);
+}
+
+.lp-nav-link:hover .lp-nav-bracket:last-child,
+.lp-nav-link:focus-visible .lp-nav-bracket:last-child {
+  transform: translateX(4px);
+}
+
+/* KAYIT OL = kayda alma butonu: yanıp sönen REC noktası */
+@keyframes lp-rec-blink {
+  0%, 55% { opacity: 1; }
+  56%, 100% { opacity: 0.15; }
+}
+
+.lp-rec-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  white-space: nowrap;
+  padding: 0.55rem 1.15rem;
+  font-family: var(--lp-font-crt);
+  font-size: 1.125rem;
+  letter-spacing: 0.18em;
+  color: var(--lp-ink);
+  border: 1px solid var(--lp-red-dim);
+  border-radius: 2px;
+  background: oklch(0.63 0.26 19 / 0.07);
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.lp-rec-dot {
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 999px;
+  background: var(--lp-red);
+  box-shadow: 0 0 8px oklch(0.63 0.26 19 / 0.8);
+  animation: lp-rec-blink 1.4s steps(1) infinite;
+}
+
+.lp-rec-btn:hover,
+.lp-rec-btn:focus-visible {
+  color: oklch(0.98 0 0);
+  border-color: var(--lp-red);
+  background: oklch(0.63 0.26 19 / 0.18);
+  box-shadow:
+    0 0 16px oklch(0.63 0.26 19 / 0.35),
+    inset 0 0 14px oklch(0.63 0.26 19 / 0.12);
+  outline: none;
+}
+
+/* ============================================================
+   Arşiv film şeridi — sürüklenebilir vitrin
+   ============================================================ */
+
+.lp-strip {
+  overflow: hidden;
+  padding: 2.5rem 0 2rem;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.lp-strip--grabbing {
+  cursor: grabbing;
+}
+
+.lp-strip-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  gap: 1.25rem;
+  will-change: transform;
+}
+
+.lp-film-card {
+  flex: none;
+  transition: filter 220ms ease;
+  filter: saturate(0.55) brightness(0.7);
+}
+
+.lp-film-card:hover {
+  filter: saturate(1) brightness(1);
+}
+
+/* Film karesi: yanlarda perforasyon delikleri (dikey şerit) */
+.lp-film-frame {
+  position: relative;
+  aspect-ratio: 9 / 14;
+  overflow: hidden;
+  border: 1px solid var(--lp-line);
+  border-radius: 2px;
+  background: var(--lp-void-deep);
+  padding: 0 0.85rem;
+}
+
+.lp-film-frame::before,
+.lp-film-frame::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0.85rem;
+  background-image: radial-gradient(
+    circle at center,
+    oklch(0.32 0 0) 0 2.5px,
+    transparent 3px
+  );
+  background-size: 100% 1.15rem;
+  background-repeat: repeat-y;
+  background-position: center;
+}
+
+.lp-film-frame::before { left: 0; }
+.lp-film-frame::after { right: 0; }
+
+.lp-film-frame > video,
+.lp-film-frame > img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+/* Hero feature karesinin piksel örtüsü — HeroSection GSAP'iyle söner */
+.lp-reveal-cell {
+  transform: scale(1);
+  will-change: transform;
+}
+
+/* Hero sahnesi: tabela, kare alanının üzerine ortalanır; kare başta gizli */
+.lp-stage-sign {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lp-feature-wrap {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Reduced motion: yerleşme animasyonu yok — tabela statik üstte,
+   kare baştan görünür (GSAP da aynı durumu inline set eder) */
+@media (prefers-reduced-motion: reduce) {
+  .lp-stage-sign {
+    position: static;
+    margin-bottom: 2rem;
+  }
+
+  .lp-feature-wrap {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.lp-film-caption {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0.25rem 0;
+  font-family: var(--lp-font-crt);
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  color: var(--lp-ink-dim);
+}
+
+.lp-film-rec {
+  color: var(--lp-red-dim);
+  transition: color 220ms ease;
+}
+
+.lp-film-card:hover .lp-film-rec {
+  color: var(--lp-red);
+}
+
+/* ============================================================
+   Auth — terminal oturumu form elemanları
+   ============================================================ */
+
+.lp-label {
+  display: block;
+  font-family: var(--lp-font-crt);
+  font-size: 0.9375rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--lp-ink-dim);
+}
+
+.lp-input {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  font-family: var(--lp-font-body);
+  font-size: 1rem;
+  color: var(--lp-ink);
+  border: 1px solid var(--lp-line);
+  border-radius: 2px;
+  background: oklch(0.16 0.005 250);
+  caret-color: var(--lp-red);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.lp-input:focus {
+  outline: none;
+  border-color: var(--lp-red);
+  box-shadow:
+    0 0 12px oklch(0.63 0.26 19 / 0.25),
+    inset 0 0 8px oklch(0.63 0.26 19 / 0.06);
+}
+
+/* Chrome autofill sarısını bastır — zift zemin korunur */
+.lp-input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px oklch(0.16 0.005 250) inset;
+  -webkit-text-fill-color: oklch(0.91 0 0);
+}
+
+.lp-alert {
+  display: flex;
+  gap: 0.6em;
+  align-items: baseline;
+  padding: 0.6rem 0.85rem;
+  border-left: 2px solid var(--lp-red);
+  background: oklch(0.63 0.26 19 / 0.08);
+  color: var(--lp-ink);
+  font-size: 0.9375rem;
+}
+
+.lp-alert-prefix {
+  font-family: var(--lp-font-crt);
+  letter-spacing: 0.15em;
+  color: var(--lp-red);
+  white-space: nowrap;
 }
 
 /* Reduced motion: tüm dekoratif animasyonlar kapanır */
 @media (prefers-reduced-motion: reduce) {
-  .lp-boil,
-  .lp-boil-slow,
   .lp-static,
-  .lp-cursor {
+  .lp-cursor,
+  .lp-neon-letter--broken .lp-neon-lit,
+  .lp-rec-dot {
     animation: none;
   }
 }

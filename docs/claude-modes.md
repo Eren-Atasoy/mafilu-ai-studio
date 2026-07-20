@@ -102,8 +102,10 @@ Projedeki araçlar: **GSAP + ScrollTrigger + Lenis** (kurulu), gerekirse Framer 
 
 | Yüzey | Durum | Uygulanmış modlar |
 |---|---|---|
-| Landing (`src/components/landing/`) | Sketchpunk retro-analog, canlı | Mod 1+2+3 büyük ölçüde uygulandı |
-| Auth sayfaları (`src/app/(auth)/`) | Shadcn default | Hiçbiri — sırada |
-| Dashboard + Studio (`src/app/(app)/`) | Shadcn default | Hiçbiri — brief'te VHS kaset kartları planlı |
+| Landing (`src/components/landing/`) | **"The Void"**: Netflix karanlığı × Mr. Robot — neon MAFILU tabelası, sidewave piksel geçişi, vitrin duvarı | Mod 1+2+3 uygulandı (karakalem/sketchpunk tamamen kaldırıldı — geri getirilmez) |
+| Auth sayfaları (`src/app/(auth)/`) | **The Void terminal oturumu** — lp-panel pencere, lp-input/lp-label/lp-alert, PixelLink geçişleri | Mod 1+2 uygulandı |
+| Dashboard + Studio (`src/app/(app)/`) | VHS raf Mod 1 iskeleti hazır | Mod 2+3 bekliyor; The Void paletine uyarlanacak |
 
-Landing tasarım token'ları: `src/components/landing/landing.css` (`--lp-*` OKLCH seti).
+Landing tasarım token'ları: `src/components/landing/landing.css` (`--lp-*` OKLCH seti):
+zift `--lp-void`, neon kırmızı `--lp-red` (#FF003C), fosfor beyazı `--lp-ink`,
+kül çizgi `--lp-line`, lacivert derinlik `--lp-navy`. Display font: Anton (`--font-display`).

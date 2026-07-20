@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { CrtIntro } from "./CrtIntro";
+import { NeonIntro } from "./NeonIntro";
 import { LandingNav } from "./LandingNav";
 import { HeroSection } from "./HeroSection";
 import { PipelineSection } from "./PipelineSection";
@@ -13,11 +13,15 @@ import "./landing.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
+interface LandingPageProps {
+  showcaseFiles: string[];
+}
+
 /**
- * Landing kökü: Lenis smooth scroll + GSAP entegrasyonu, CRT intro
- * sekansı ve intro sonrası nav/hero reveal timeline'ı.
+ * Landing kökü: Lenis smooth scroll + GSAP entegrasyonu, neon tabela
+ * introsu ve intro sonrası nav/hero reveal timeline'ı.
  */
-export function LandingPage() {
+export function LandingPage({ showcaseFiles }: LandingPageProps) {
   const rootRef = useRef<HTMLDivElement>(null);
 
   // Lenis — yalnızca landing yaşam döngüsünde, ScrollTrigger ile senkron
@@ -42,13 +46,20 @@ export function LandingPage() {
   const handleIntroComplete = useCallback(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      tl.to(".lp-nav", { opacity: 1, duration: 0.6 })
-        .to(
-          ".lp-hero-word",
-          { y: 0, duration: 0.75, stagger: 0.08, ease: "power4.out" },
-          "-=0.3"
-        )
-        .to(".lp-hero-sub", { opacity: 1, duration: 0.7, stagger: 0.12 }, "-=0.35");
+      tl.to(".lp-nav", { opacity: 1, duration: 0.6 }).fromTo(
+        ".lp-hero-item",
+        { opacity: 0, y: 24 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          stagger: 0.1,
+          // Transform temizlenmeli: transform'lu ata, içindeki position:fixed
+          // tabelanın (dock uçuşu) viewport referansını bozar
+          onComplete: () => gsap.set(".lp-hero-item", { clearProps: "transform" }),
+        },
+        "-=0.35"
+      );
     }, rootRef);
     // Timeline tek seferlik; context revert'e gerek yok (sayfa ömrü boyunca kalır)
     void ctx;
@@ -56,14 +67,13 @@ export function LandingPage() {
 
   return (
     <div ref={rootRef} className="landing relative min-h-svh">
-      <div className="lp-paper-texture" />
       <div className="lp-scanlines" />
 
-      <CrtIntro onComplete={handleIntroComplete} />
+      <NeonIntro onComplete={handleIntroComplete} />
 
       <LandingNav />
       <main className="relative z-10">
-        <HeroSection />
+        <HeroSection showcaseFiles={showcaseFiles} />
         <PipelineSection />
       </main>
       <MegaFooter />

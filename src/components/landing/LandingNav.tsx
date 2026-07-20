@@ -1,9 +1,11 @@
 "use client";
 
-import Link from "next/link";
+import { NeonSign } from "./NeonSign";
+import { PixelLink } from "./PixelTransition";
 
 /**
- * Flash sonrası beliren minimal nav — CRT terminal estetiği.
+ * Kromsuz yüzen nav: çizgi/bar yok. Sol taraf boş — orası scroll'da
+ * hero tabelasının yerleşeceği dock hedefi (#lp-sign-dock).
  * Görünürlük animasyonu LandingPage'deki GSAP timeline'dan gelir (.lp-nav).
  */
 export function LandingNav() {
@@ -11,22 +13,29 @@ export function LandingNav() {
     <header className="lp-nav fixed inset-x-0 top-0 z-40 opacity-0">
       <nav
         aria-label="Ana gezinme"
-        className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4"
+        className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5"
       >
-        <Link
-          href="/"
-          className="lp-glow-phosphor text-2xl tracking-wider"
-          style={{ fontFamily: "var(--lp-font-crt)", color: "var(--lp-phosphor)" }}
+        {/* Nav tabelası: hero'daki tabela uçuşunu bitirince görünür olur
+            (devir teslim) — uçuş hedefi bu elemanın rect'idir */}
+        <span
+          id="lp-nav-sign"
+          className="pointer-events-none text-xl tracking-[0.06em] opacity-0"
+          aria-hidden="true"
         >
-          MAFILU_
-        </Link>
-        <div className="flex items-center gap-3">
-          <Link href="/giris" className="lp-btn text-base">
+          <NeonSign variant="static" />
+        </span>
+
+        <div className="flex items-center gap-6">
+          <PixelLink href="/giris" className="lp-nav-link">
+            <span className="lp-nav-bracket" aria-hidden="true">[</span>
             GİRİŞ
-          </Link>
-          <Link href="/kayit" className="lp-btn lp-btn--solid text-base">
+            <span className="lp-nav-bracket" aria-hidden="true">]</span>
+          </PixelLink>
+
+          <PixelLink href="/kayit" className="lp-rec-btn">
+            <span className="lp-rec-dot" aria-hidden="true" />
             KAYIT OL
-          </Link>
+          </PixelLink>
         </div>
       </nav>
     </header>

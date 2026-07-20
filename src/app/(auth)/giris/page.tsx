@@ -10,6 +10,7 @@ export default function SignInPage() {
     <AuthCard
       title={t.auth.signInTitle}
       subtitle={t.auth.signInSubtitle}
+      operation="OTURUM_AÇ"
       footerText={t.auth.noAccount}
       footerLinkHref="/kayit"
       footerLinkLabel={t.auth.signUp}
