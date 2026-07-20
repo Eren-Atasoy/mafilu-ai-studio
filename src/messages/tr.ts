@@ -34,6 +34,7 @@ export const tr = {
     projectTitle: "Proje adı",
     projectDescription: "Açıklama (isteğe bağlı)",
     deleteConfirm: "Bu projeyi silmek istediğine emin misin?",
+    emptyCassette: "Henüz üretim yok",
     statusDraft: "Taslak",
     statusEditing: "Düzenleniyor",
     statusPublished: "Yayınlandı",
